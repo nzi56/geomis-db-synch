@@ -10,11 +10,11 @@ set dbname=bgd_nesco
 SET EXPORT_DIR=D:/backup-by-scheduler
 set dmp_path=D:\PostgreSQL\16\bin\pg_dump.exe
 set psqlPath=D:\PostgreSQL\16\bin\psql
-
+echo:
 echo Fetching Tracking Records....
 :: Fetch data using curl 
 curl %API_HOST%/gdb/api/gdb/fetch-tracking -o "fetch_tracking_output.txt"
-
+echo:
 echo Fetch Tracking completed
 
 REM Get the current day of the week
@@ -24,42 +24,45 @@ REM Check if today is Friday
 if "%DAY%"=="Friday" (
 echo calling  full synch with finalized data of working database....
 "%psqlPath%" -U %PGUSER% -h %PGHOST% -p %PGPORT% -d %dbname% -c "CALL webgis.full_synch();"
+echo:
 echo synch completed
 ) else (
+    echo:
 echo calling  partial synch with working database which are modified after last synch......
 "%psqlPath%" -U %PGUSER% -h %PGHOST% -p %PGPORT% -d %dbname% -c "CALL webgis.partial_synch();"
+echo:
 echo synch completed
 )
-
+echo:
 echo Taking full backup
 %dmp_path% -h %PGHOST% -U %PGUSER% -p %PGPORT% -F c -b -v -f %EXPORT_DIR%\bgd_nesco_full.backup bgd_nesco
-
+echo:
 echo Taking partial backup ( oms schema backup)
 %dmp_path% -h %PGHOST% -U %PGUSER% -p %PGPORT% -F c -b -v -f %EXPORT_DIR%\bgd_nesco_oms.backup -n oms bgd_nesco
-
+echo:
 echo Backup completed
-
+echo:
 echo Uploading full backup to google drive
 
 curl --location "%API_HOST%/gdb/api/gdb/upload" ^
 --header "Content-Type: application/json" ^
 --header "Cookie: JSESSIONID=A3D3DFB816C711BE477C773F59F1EB01" ^
 --data "{""file"":""%EXPORT_DIR%/bgd_nesco_full.backup""}"
-
+echo:
 echo Uploading schema backup to google drive
-
+echo:
 curl --location "%API_HOST%/gdb/api/gdb/upload" ^
 --header "Content-Type: application/json" ^
 --header "Cookie: JSESSIONID=A3D3DFB816C711BE477C773F59F1EB01" ^
 --data "{""file"":""%EXPORT_DIR%/bgd_nesco_oms.backup""}"
-
+echo:
 rem echo Removing old files from google drive
 curl --location --request POST "%API_HOST%/gdb/api/gdb/removeoldfiles/10" --header "Cookie: JSESSIONID=A3D3DFB816C711BE477C773F59F1EB01"
-
+echo:
 REM Clear the password from environment
 SET PGPASSWORD=
 
-
+echo:
 echo end of script 
-
+echo:
 endlocal
