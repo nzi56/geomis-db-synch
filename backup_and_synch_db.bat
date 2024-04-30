@@ -11,23 +11,24 @@ SET EXPORT_DIR=D:/backup-by-scheduler
 set dmp_path=D:\PostgreSQL\16\bin\pg_dump.exe
 set psqlPath=D:\PostgreSQL\16\bin\psql
 
-echo calling  Fetch Tracking
+echo Fetching Tracking Records....
 :: Fetch data using curl 
 curl %API_HOST%/gdb/api/gdb/fetch-tracking -o "fetch_tracking_output.txt"
 
+echo Fetch Tracking completed
 
 REM Get the current day of the week
 for /f "tokens=1 delims= " %%d in ('powershell -Command "Get-Date -format dddd"') do set DAY=%%d
 
 REM Check if today is Friday
 if "%DAY%"=="Friday" (
-echo calling  full synch
+echo calling  full synch with finalized data of working database....
 "%psqlPath%" -U %PGUSER% -h %PGHOST% -p %PGPORT% -d %dbname% -c "CALL webgis.full_synch();"
-
+echo synch completed
 ) else (
-   echo calling partial synch...
+echo calling  partial synch with working database which are modified after last synch......
 "%psqlPath%" -U %PGUSER% -h %PGHOST% -p %PGPORT% -d %dbname% -c "CALL webgis.partial_synch();"
-
+echo synch completed
 )
 
 echo Taking full backup
@@ -36,6 +37,7 @@ echo Taking full backup
 echo Taking partial backup ( oms schema backup)
 %dmp_path% -h %PGHOST% -U %PGUSER% -p %PGPORT% -F c -b -v -f %EXPORT_DIR%\bgd_nesco_oms.backup -n oms bgd_nesco
 
+echo Backup completed
 
 echo Uploading full backup to google drive
 
