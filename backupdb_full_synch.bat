@@ -50,7 +50,7 @@ curl --location "%API_HOST%/gdb/api/gdb/upload" ^
 --data "{""file"":""%EXPORT_DIR%/bgd_nesco_oms.backup""}"
 
 echo Removing old files from google drive
-curl --location --request POST "%API_HOST%/gdb/api/gdb/removeoldfiles" ^
+curl --location --request POST "%API_HOST%/gdb/api/gdb/removeoldfiles/10" ^
 --header "Cookie: JSESSIONID=A3D3DFB816C711BE477C773F59F1EB01"
 
 REM Clear the password from environment
