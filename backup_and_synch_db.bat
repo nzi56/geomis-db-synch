@@ -21,7 +21,7 @@ for /f "tokens=1 delims= " %%d in ('powershell -Command "Get-Date -format dddd"'
 
 REM Check if today is Friday
 if "%DAY%"=="Friday" (
-echo calling  wfull synch
+echo calling  full synch
 "%psqlPath%" -U %PGUSER% -h %PGHOST% -p %PGPORT% -d %dbname% -c "CALL webgis.full_synch();"
 
 ) else (
