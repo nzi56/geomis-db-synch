@@ -34,12 +34,7 @@ echo:
 echo synch completed
 )
 echo:
-echo Taking full backup
-%dmp_path% -h %PGHOST% -U %PGUSER% -p %PGPORT% -F c -b -v -f %EXPORT_DIR%\bgd_nesco_full.backup bgd_nesco
-echo:
-echo Taking partial backup ( oms schema backup)
-%dmp_path% -h %PGHOST% -U %PGUSER% -p %PGPORT% -F c -b -v -f %EXPORT_DIR%\bgd_nesco_oms.backup -n oms bgd_nesco
-echo:
+
 
 echo Taking schema only backups
 %dmp_path% -h %PGHOST% -U %PGUSER% -p %PGPORT% -F c -b -v -f %EXPORT_DIR%\bgd_nesco_schema.backup -s bgd_nesco
@@ -50,20 +45,6 @@ echo Taking data only backups
 
 
 echo Backup completed
-echo:
-echo Uploading full backup to google drive
-
-curl --location "%API_HOST%/gdb/api/gdb/upload" ^
---header "Content-Type: application/json" ^
---header "Cookie: JSESSIONID=A3D3DFB816C711BE477C773F59F1EB01" ^
---data "{""file"":""%EXPORT_DIR%/bgd_nesco_full.backup""}"
-echo:
-echo Uploading schema backup to google drive
-echo:
-curl --location "%API_HOST%/gdb/api/gdb/upload" ^
---header "Content-Type: application/json" ^
---header "Cookie: JSESSIONID=A3D3DFB816C711BE477C773F59F1EB01" ^
---data "{""file"":""%EXPORT_DIR%/bgd_nesco_oms.backup""}"
 echo:
 
 echo Uploading schema only backup to google drive
