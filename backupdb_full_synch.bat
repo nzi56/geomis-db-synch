@@ -33,6 +33,14 @@ echo Taking partial backup
 
 %dmp_path% -h %PGHOST% -U %PGUSER% -p %PGPORT% -F c -b -v -f %EXPORT_DIR%\bgd_nesco_oms.backup -n oms bgd_nesco
 
+
+echo Taking schema only backups
+%dmp_path% -h %PGHOST% -U %PGUSER% -p %PGPORT% -F c -b -v -f %EXPORT_DIR%\bgd_nesco_schema.backup -s bgd_nesco
+
+echo Taking data only backups
+%dmp_path% -h %PGHOST% -U %PGUSER% -p %PGPORT% -F c -b -v -f %EXPORT_DIR%\bgd_nesco_data.backup -a bgd_nesco
+
+
 echo Uploading full backup to google drive
 curl --location "%API_HOST%/gdb/api/gdb/upload" ^
 --header "Content-Type: application/json" ^
