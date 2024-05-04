@@ -40,6 +40,15 @@ echo:
 echo Taking partial backup ( oms schema backup)
 %dmp_path% -h %PGHOST% -U %PGUSER% -p %PGPORT% -F c -b -v -f %EXPORT_DIR%\bgd_nesco_oms.backup -n oms bgd_nesco
 echo:
+
+echo Taking schema only backups
+%dmp_path% -h %PGHOST% -U %PGUSER% -p %PGPORT% -F c -b -v -f %EXPORT_DIR%\bgd_nesco_schema.backup -s bgd_nesco
+echo:
+echo Taking data only backups
+%dmp_path% -h %PGHOST% -U %PGUSER% -p %PGPORT% -F c -b -v -f %EXPORT_DIR%\bgd_nesco_data.backup -a bgd_nesco
+
+
+
 echo Backup completed
 echo:
 echo Uploading full backup to google drive
@@ -56,10 +65,23 @@ curl --location "%API_HOST%/gdb/api/gdb/upload" ^
 --header "Cookie: JSESSIONID=A3D3DFB816C711BE477C773F59F1EB01" ^
 --data "{""file"":""%EXPORT_DIR%/bgd_nesco_oms.backup""}"
 echo:
-rem echo Removing old files from google drive
+
+echo Uploading schema only backup to google drive
+curl --location "%API_HOST%/gdb/api/gdb/upload" ^
+--header "Content-Type: application/json" ^
+--header "Cookie: JSESSIONID=A3D3DFB816C711BE477C773F59F1EB01" ^
+--data "{""file"":""%EXPORT_DIR%/bgd_nesco_schema.backup""}"
+echo:
+echo Uploading data backup to google drive
+curl --location "%API_HOST%/gdb/api/gdb/upload" ^
+--header "Content-Type: application/json" ^
+--header "Cookie: JSESSIONID=A3D3DFB816C711BE477C773F59F1EB01" ^
+--data "{""file"":""%EXPORT_DIR%/bgd_nesco_data.backup""}"
+echo:
+ echo Removing old files from google drive
 curl --location --request POST "%API_HOST%/gdb/api/gdb/removeoldfiles/10" --header "Cookie: JSESSIONID=A3D3DFB816C711BE477C773F59F1EB01"
 echo:
-REM Clear the password from environment
+ Clear the password from environment
 SET PGPASSWORD=
 
 echo:
